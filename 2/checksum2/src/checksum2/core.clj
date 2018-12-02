@@ -3,7 +3,6 @@
   (:require [clojure.math.combinatorics :as combo])
   )
 
-
 (defn check-sum [w1 w2]
   (let [wsz (count w1)
         differences (map #(= (nth w1 %) (nth w2 %)) (range wsz))
@@ -15,14 +14,8 @@
 (defn one-compare [w1 w2]
   (let [wsz (count w1)
         differences (map #(= (nth w1 %) (nth w2 %)) (range wsz))]
-    ;(println w1 w2 (count (map #(= false %) differences)) differences)
     (count (filter #(= false %) differences))
   ))
-
-
-;(defn find-closest [word words]
-;  (map 
-;   )
 
 (defn find-mismatch [words]
   (let [word-size (count words)
