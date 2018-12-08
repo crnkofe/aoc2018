@@ -10,6 +10,13 @@
            (set (map #(str (nth large %) (nth small %)) (range (count small)))))
   ))
 
+(defn individual-combo-set [] 
+  (let [small "abcdefghijklmnopqrstuvwxyz"
+        large "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        pairs (map #(vector (str (nth small %)) (str (nth large %))) (range (count small)))]
+    (map #(set %) pairs)
+  ))
+
 (defn delete-combos [input combo-data]
   (loop [current-input input
          combos (into [] combo-data)]
@@ -28,9 +35,26 @@
     )
   )
 
+
+(defn delete-prepare [input combo-data individual-combo-data]
+  (loop [reductions {}
+         individual-combos (into [] individual-combo-data)]
+    (if (empty? individual-combos)
+      reductions
+      (let [current-combo (set (first individual-combos))
+            prepared-input (delete-all-occurrences input current-combo)]
+        (recur (assoc reductions (first individual-combos) (- (count (delete-all-occurrences prepared-input combo-data)) 1)) (rest individual-combos))
+        )
+  )))
+
+
 (defn -main
   [& args]
   (let [data (slurp (nth args 0))
-          combos (combo-set)]
-      (println (- (count (delete-all-occurrences data combos)) 1))
+        combos (combo-set)
+        individual-combos (individual-combo-set)
+        all-possible-removals (first (sort-by #(nth % 1) (delete-prepare data combos individual-combos)))
+        ]
+    (println all-possible-removals)
+    (println (last all-possible-removals))
   ))
