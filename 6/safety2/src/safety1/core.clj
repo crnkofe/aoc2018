@@ -50,6 +50,18 @@
   )
 
 
+(defn total-manhattan [points point]
+  (reduce + (map #(calc-manhattan-distance point %) points))
+  )
+
+(defn manhattanize [points top-left bottom-right range-check max-manhattan-sum]
+  (let [[x y] top-left
+        [mx my] bottom-right
+        extended-points (combo/cartesian-product (range (- x range-check) (+ range-check mx)) (range (- y range-check) (+ range-check my)))]
+    (count (filter #(< (total-manhattan (vals points) %) max-manhattan-sum) extended-points))
+    )
+  )
+
 (defn border-points [table upper-left bottom-right] 
   (let [[x y] upper-left
         [xo yo] bottom-right
@@ -65,12 +77,11 @@
 (defn -main
   [& args]
     (with-open [rdr (clojure.java.io/reader (nth args 0))]
-      (let [points (into {} (map-indexed #(vector %1 (map read-string (str/split %2 #", "))) (line-seq rdr)))
-            borders (limits points)
-            table (generate-hash-table (first borders) (last borders))
-            painted-table (paint-table table points)
-            border-point-set (border-points painted-table (first borders) (last borders))
-            filtered-infinite-table (filter #(not (contains? border-point-set (last %))) painted-table)]
-        (println (apply max (vals (frequencies (vals filtered-infinite-table)))))
+      (let [manhattan-sum (Integer. (nth args 1))
+            range-check (Integer.  (nth args 2))
+            points (into {} (map-indexed #(vector %1 (map read-string (str/split %2 #", "))) (line-seq rdr)))
+            borders (limits points)]
+        (println (manhattanize points (first borders) (last borders) range-check manhattan-sum))
+        ; (println (apply max (vals (frequencies (vals filtered-infinite-table)))))
        )
   ))
